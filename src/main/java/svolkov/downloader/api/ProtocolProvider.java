@@ -1,4 +1,4 @@
-package svolkov.downloader;
+package svolkov.downloader.api;
 
 /**
  * Downloader for specific protocol.

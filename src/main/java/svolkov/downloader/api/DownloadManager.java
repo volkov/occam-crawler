@@ -1,4 +1,4 @@
-package svolkov.downloader;
+package svolkov.downloader.api;
 
 /**
  * Download manager facade, allows to add request, inspect request execution status, cancel request execution and get result.

@@ -6,6 +6,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import svolkov.downloader.api.DownloadRequest;
+import svolkov.downloader.api.ProtocolProvider;
+import svolkov.downloader.api.RequestNotSupported;
+
 public class Main {
 
 	public static void main(String[] args) throws MalformedURLException, InterruptedException, RequestNotSupported, URISyntaxException {

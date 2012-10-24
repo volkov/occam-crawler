@@ -9,6 +9,11 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import svolkov.downloader.api.DownloadRequest;
+import svolkov.downloader.api.DownloadResponse;
+import svolkov.downloader.api.FetchCallable;
+import svolkov.downloader.api.ProtocolProvider;
+
 /**
  * Protocol provider using {@link HttpClient}.
  * @author vsa

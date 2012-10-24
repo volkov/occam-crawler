@@ -9,6 +9,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
 
+import svolkov.downloader.api.DownloadManager;
+import svolkov.downloader.api.DownloadRequest;
+import svolkov.downloader.api.DownloadResponse;
+import svolkov.downloader.api.DownloadStatus;
+import svolkov.downloader.api.FetchCallable;
+import svolkov.downloader.api.ProtocolProvider;
+import svolkov.downloader.api.RequestNotSupported;
+
 public class ThreadPoolDownloadManager implements DownloadManager {
 
 	private Map<Long, FetchInfo> data = new ConcurrentHashMap<Long, FetchInfo>();

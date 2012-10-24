@@ -1,4 +1,4 @@
-package svolkov.downloader;
+package svolkov.downloader.api;
 
 /**
  * Stores result of downloading {@link DownloadManager}.

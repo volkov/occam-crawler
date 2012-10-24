@@ -1,4 +1,4 @@
-package svolkov.downloader;
+package svolkov.downloader.api;
 
 import java.util.concurrent.Callable;
 

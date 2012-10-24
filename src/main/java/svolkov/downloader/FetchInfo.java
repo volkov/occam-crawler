@@ -2,6 +2,9 @@ package svolkov.downloader;
 
 import java.util.concurrent.Future;
 
+import svolkov.downloader.api.DownloadResponse;
+import svolkov.downloader.api.FetchCallable;
+
 /**
  * Stores runtime info about download.
  * @author vsa
