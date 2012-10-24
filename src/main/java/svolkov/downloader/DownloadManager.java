@@ -26,7 +26,7 @@ public interface DownloadManager {
 	 * Cancels request with specified id
 	 * @param id identifier of request in manager.
 	 */
-	void cancelRequest(Long id);
+	boolean cancelRequest(Long id);
 
 	/**
 	 * Returns response for request with specified id.

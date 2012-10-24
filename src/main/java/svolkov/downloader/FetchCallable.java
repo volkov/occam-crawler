@@ -3,15 +3,15 @@ package svolkov.downloader;
 import java.util.concurrent.Callable;
 
 /**
- * Callable with cancellation support.
+ * Callable with clean support.
  * @author vsa
  *
  */
 public interface FetchCallable extends Callable<DownloadResponse> {
 
 	/**
-	 * Cancels request if {@link Thread#interrupt()} is not supported.
+	 * Stops execution if {@link Thread#interrupt()} is not supported.
 	 */
-	void cancel();
+	void clean();
 
 }

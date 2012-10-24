@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicLong;
@@ -30,18 +31,17 @@ public class ThreadPoolDownloadManager implements DownloadManager {
 			throw new RequestNotSupported();
 		}
 
-		long id = idSequence.incrementAndGet();
 		final FetchInfo info = new FetchInfo();
 		info.setTask(task);
-		info.setRequest(request);
 		info.setFuture(executorService.submit(new Callable<DownloadResponse>() {
 
 			public DownloadResponse call() throws Exception {
 				info.setInProgress(true);
-				info.setResponce(info.getTask().call());
-				return null;
+				return info.getTask().call();
 			}
 		}));
+
+		long id = idSequence.incrementAndGet();
 		data.put(id, info);
 		return id;
 	}
@@ -55,6 +55,9 @@ public class ThreadPoolDownloadManager implements DownloadManager {
 		if (info == null) {
 			return null;
 		}
+		if (info.getFuture().isCancelled()) {
+			return DownloadStatus.CANCELLED;
+		}
 		if (info.getFuture().isDone()) {
 			return DownloadStatus.DONE;
 		}
@@ -64,13 +67,14 @@ public class ThreadPoolDownloadManager implements DownloadManager {
 		return DownloadStatus.PENDING;
 	}
 
-	public void cancelRequest(Long id) {
+	public boolean cancelRequest(Long id) {
 		FetchInfo info = data.get(id);
 		if (info == null) {
-			return;
+			return false;
 		}
-		info.getTask().cancel();
-		info.getFuture().cancel(true);
+		boolean result = info.getFuture().cancel(true);
+		info.getTask().clean();
+		return result;
 	}
 
 	public DownloadResponse getResponse(Long id) {
@@ -78,7 +82,13 @@ public class ThreadPoolDownloadManager implements DownloadManager {
 		if (getStatus(info) != DownloadStatus.DONE) {
 			return null;
 		}
-		return info.getResponce();
+		try {
+			return info.getFuture().get();
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		} catch (ExecutionException e) {
+		}
+		return null;
 	}
 
 	public List<ProtocolProvider> getProviders() {

@@ -2,50 +2,71 @@ package svolkov.downloader;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+/**
+ * Protocol provider using {@link HttpClient}.
+ * @author vsa
+ *
+ */
 public class HttpClientProvider implements ProtocolProvider {
 
+	/**
+	 * Accepts URI stating with http: or https:
+	 */
 	public boolean accepts(DownloadRequest request) {
-		URL url = request.getUrl();
-		return url.toString().startsWith("http:");
+		URI uri = request.getUri();
+		if (uri == null) {
+			return false;
+		}
+		return uri.toString().startsWith("http:") || uri.toString().startsWith("https:");
 	}
 
 	public FetchCallable createCallable(final DownloadRequest request) {
 		return new FetchCallable() {
 
-			private HttpGet get = new HttpGet(request.getUrl().toString());
+			private final HttpGet get = new HttpGet(request.getUri());
 
 			public DownloadResponse call() throws Exception {
+				InputStream is = null;
+				DownloadResponse result = new DownloadResponse();
 				try {
+					HttpResponse responce = null;
 					HttpClient client = new DefaultHttpClient();
-					HttpResponse responce = client.execute(get);
-					DownloadResponse result = new DownloadResponse();
-					InputStream is = responce.getEntity().getContent();
+					responce = client.execute(get);
+					result.setProtocolResponse(responce.getStatusLine().getStatusCode());
+					result.setMessage(responce.getStatusLine().toString());
+
+					is = responce.getEntity().getContent();
 					ByteArrayOutputStream out = new ByteArrayOutputStream();
 					byte[] buffer = new byte[2048];
 					int len;
 					while ((len = is.read(buffer, 0, buffer.length)) != -1) {
 						out.write(buffer, 0, len);
 					}
+
 					result.setContent(out.toByteArray());
 					return result;
 				} catch (Exception e) {
-					System.out.println(e);
-					throw e;
+					if (Thread.interrupted()) {
+						throw e;
+					}
+					result.setMessage(e.getMessage());
+					return result;
+				} finally {
+					if (is != null) {
+						is.close();
+					}
 				}
 			}
 
-			public void cancel() {
-				HttpGet inner = get;
-				if (inner != null) {
-					inner.abort();
-				}
+			public void clean() {
+				get.abort();
 			}
 		};
 	}

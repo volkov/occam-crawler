@@ -2,33 +2,18 @@ package svolkov.downloader;
 
 import java.util.concurrent.Future;
 
+/**
+ * Stores runtime info about download.
+ * @author vsa
+ *
+ */
 public class FetchInfo {
-
-	private DownloadRequest request;
-
-	private DownloadResponse responce;
 
 	private FetchCallable task;
 
 	private Future<DownloadResponse> future;
 
 	private volatile boolean inProgress;
-
-	public DownloadRequest getRequest() {
-		return request;
-	}
-
-	public void setRequest(DownloadRequest request) {
-		this.request = request;
-	}
-
-	public DownloadResponse getResponce() {
-		return responce;
-	}
-
-	public void setResponce(DownloadResponse responce) {
-		this.responce = responce;
-	}
 
 	public FetchCallable getTask() {
 		return task;

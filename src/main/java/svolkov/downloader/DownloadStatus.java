@@ -1,5 +1,5 @@
 package svolkov.downloader;
 
 public enum DownloadStatus {
-	PENDING, IN_PROGRESS, DONE
+	PENDING, IN_PROGRESS, DONE, CANCELLED
 }

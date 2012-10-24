@@ -1,25 +1,33 @@
 package svolkov.downloader;
 
 import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 
+/**
+ * Stores info about request.
+ * @author vsa
+ *
+ */
 public class DownloadRequest implements Serializable {
 
 	private static final long serialVersionUID = 2646185615781725091L;
 
-	public DownloadRequest(String url) throws MalformedURLException {
-		this.url = new URL(url);
+	private URI uri;
+
+	/**
+	 * Returns uri.
+	 * @return uri.
+	 */
+	public URI getUri() {
+		return uri;
 	}
 
-	private URL url;
-
-	public URL getUrl() {
-		return url;
-	}
-
-	public void setUrl(URL url) {
-		this.url = url;
+	/**
+	 * Sets uri.
+	 * @param uri.
+	 */
+	public void setUri(URI uri) {
+		this.uri = uri;
 	}
 
 }
