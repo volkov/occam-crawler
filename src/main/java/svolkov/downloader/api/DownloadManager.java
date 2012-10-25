@@ -23,29 +23,31 @@ public interface DownloadManager {
 	DownloadStatus getStatus(Long id);
 
 	/**
-	 * Cancels request with specified id
+	 * Cancels request with specified id.
 	 * @param id identifier of request in manager.
+	 * @return <tt>true</tt> if request was canceled, or
+	 * <tt>false</tt> if request was not found or already in {@link DownloadStatus#DONE} or {@link DownloadStatus#CANCELLED} state.
 	 */
 	boolean cancelRequest(Long id);
 
 	/**
 	 * Returns response for request with specified id.
-	 * @param id
-	 * @return response, or <tt>null</tt> if corresponding request is not in {@link DownloadStatus#DONE} 
+	 * @param id identifier of request in manager.
+	 * @return protocol response, or <tt>null</tt> if corresponding request is not in {@link DownloadStatus#DONE} or was removed.
 	 */
 	DownloadResponse getResponse(Long id);
 
 	/**
 	 * Waits for response for request with specified id.
 	 * @param id
-	 * @return
+	 * @return response, or <tt>null</tt> if corresponding request is in {@link DownloadStatus#CANCELLED} or was removed.
 	 */
 	DownloadResponse waitResponse(Long id);
 
 	/**
-	 * Removes response for request with specified id, cancels execution if necessary.
+	 * Removes request with specified id, cancels execution if necessary.
 	 * @param id
-	 * @return
+	 * @return response, or <tt>null</tt> if corresponding request is in {@link DownloadStatus#CANCELLED} or already removed.
 	 */
 	DownloadResponse removeResponse(Long id);
 

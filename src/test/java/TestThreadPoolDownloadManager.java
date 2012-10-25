@@ -52,6 +52,7 @@ public class TestThreadPoolDownloadManager {
 		Thread.sleep(10);
 		Assert.assertTrue(manager.cancelRequest(id));
 		Assert.assertEquals(DownloadStatus.CANCELLED, manager.getStatus(id));
+		Assert.assertFalse(manager.cancelRequest(id));
 		Assert.assertNull(manager.getResponse(id));
 		Assert.assertNull(manager.waitResponse(id));
 		Thread.sleep(100);
