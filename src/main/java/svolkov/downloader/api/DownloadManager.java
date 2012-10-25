@@ -10,7 +10,7 @@ public interface DownloadManager {
 	/**
 	 * Adds request to download queue.
 	 * @param request request to download.
-	 * @return identifier of request in manager.
+	 * @return identifier of request in manager or <tt>null<tt> if manager is off.
 	 * @throws RequestNotSupported if request type is not supported.
 	 */
 	Long addDownloadRequest(DownloadRequest request) throws RequestNotSupported;
@@ -31,8 +31,20 @@ public interface DownloadManager {
 	/**
 	 * Returns response for request with specified id.
 	 * @param id
-	 * @return
+	 * @return response, or <tt>null</tt> if corresponding request is not in {@link DownloadStatus#DONE} 
 	 */
 	DownloadResponse getResponse(Long id);
+
+	/**
+	 * Waits for response for request with specified id.
+	 * @param id
+	 * @return
+	 */
+	DownloadResponse waitResponse(Long id);
+
+	/**
+	 * Stop accepting requests. 
+	 */
+	void shutdown();
 
 }

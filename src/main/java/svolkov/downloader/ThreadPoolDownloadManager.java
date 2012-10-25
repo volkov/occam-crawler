@@ -3,10 +3,12 @@ package svolkov.downloader;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicLong;
 
 import svolkov.downloader.api.DownloadManager;
@@ -17,16 +19,32 @@ import svolkov.downloader.api.FetchCallable;
 import svolkov.downloader.api.ProtocolProvider;
 import svolkov.downloader.api.RequestNotSupported;
 
+/**
+ * Download manager based on {@link ThreadPoolExecutor}
+ * @author vsa
+ *
+ */
 public class ThreadPoolDownloadManager implements DownloadManager {
 
 	private Map<Long, FetchInfo> data = new ConcurrentHashMap<Long, FetchInfo>();
 
-	private ExecutorService executorService = Executors.newFixedThreadPool(10);
+	private ExecutorService executorService;
 
-	private List<ProtocolProvider> providers;
+	private List<? extends ProtocolProvider> providers;
 
 	private AtomicLong idSequence = new AtomicLong(0);
 
+	/**
+	 * Creates manager with specified number of threads and list of providers.
+	 * @param threads
+	 * @param providers
+	 */
+	public ThreadPoolDownloadManager(int threads, List<? extends ProtocolProvider> providers) {
+		executorService = Executors.newFixedThreadPool(threads);
+		this.providers = providers;
+	}
+
+	@Override
 	public Long addDownloadRequest(DownloadRequest request) throws RequestNotSupported {
 
 		FetchCallable task = null;
@@ -54,6 +72,7 @@ public class ThreadPoolDownloadManager implements DownloadManager {
 		return id;
 	}
 
+	@Override
 	public DownloadStatus getStatus(Long id) {
 		FetchInfo info = data.get(id);
 		return getStatus(info);
@@ -75,6 +94,7 @@ public class ThreadPoolDownloadManager implements DownloadManager {
 		return DownloadStatus.PENDING;
 	}
 
+	@Override
 	public boolean cancelRequest(Long id) {
 		FetchInfo info = data.get(id);
 		if (info == null) {
@@ -85,6 +105,7 @@ public class ThreadPoolDownloadManager implements DownloadManager {
 		return result;
 	}
 
+	@Override
 	public DownloadResponse getResponse(Long id) {
 		FetchInfo info = data.get(id);
 		if (getStatus(info) != DownloadStatus.DONE) {
@@ -99,14 +120,21 @@ public class ThreadPoolDownloadManager implements DownloadManager {
 		return null;
 	}
 
-	public List<ProtocolProvider> getProviders() {
-		return providers;
+	@Override
+	public DownloadResponse waitResponse(Long id) {
+		FetchInfo info = data.get(id);
+		try {
+			return info.getFuture().get();
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		} catch (ExecutionException e) {
+		} catch (CancellationException e) {
+		}
+		return null;
+
 	}
 
-	public void setProviders(List<ProtocolProvider> providers) {
-		this.providers = providers;
-	}
-
+	@Override
 	public void shutdown() {
 		executorService.shutdown();
 	}

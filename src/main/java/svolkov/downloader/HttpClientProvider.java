@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URI;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -24,6 +25,7 @@ public class HttpClientProvider implements ProtocolProvider {
 	/**
 	 * Accepts URI stating with http: or https:
 	 */
+	@Override
 	public boolean accepts(DownloadRequest request) {
 		URI uri = request.getUri();
 		if (uri == null) {
@@ -32,6 +34,7 @@ public class HttpClientProvider implements ProtocolProvider {
 		return uri.toString().startsWith("http:") || uri.toString().startsWith("https:");
 	}
 
+	@Override
 	public FetchCallable createCallable(final DownloadRequest request) {
 		return new FetchCallable() {
 
@@ -44,8 +47,9 @@ public class HttpClientProvider implements ProtocolProvider {
 					HttpResponse responce = null;
 					HttpClient client = new DefaultHttpClient();
 					responce = client.execute(get);
-					result.setProtocolResponse(responce.getStatusLine().getStatusCode());
-					result.setMessage(responce.getStatusLine().toString());
+					StatusLine status = responce.getStatusLine();
+					result.setProtocolResponse(status.getStatusCode());
+					result.setMessage(status.toString());
 
 					is = responce.getEntity().getContent();
 					ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -56,11 +60,13 @@ public class HttpClientProvider implements ProtocolProvider {
 					}
 
 					result.setContent(out.toByteArray());
+					result.setSuccess(true);
 					return result;
 				} catch (Exception e) {
 					if (Thread.interrupted()) {
 						throw e;
 					}
+					result.setSuccess(false);
 					result.setMessage(e.getMessage());
 					return result;
 				} finally {
