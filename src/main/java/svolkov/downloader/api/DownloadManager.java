@@ -43,6 +43,13 @@ public interface DownloadManager {
 	DownloadResponse waitResponse(Long id);
 
 	/**
+	 * Removes response for request with specified id, cancels execution if necessary.
+	 * @param id
+	 * @return
+	 */
+	DownloadResponse removeResponse(Long id);
+
+	/**
 	 * Stop accepting requests. 
 	 */
 	void shutdown();

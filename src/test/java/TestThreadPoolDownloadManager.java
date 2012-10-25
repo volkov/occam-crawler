@@ -30,6 +30,10 @@ public class TestThreadPoolDownloadManager {
 		Assert.assertEquals(responce, manager.getResponse(id));
 		manager.shutdown();
 		Assert.assertEquals(responce, manager.getResponse(id));
+		Assert.assertEquals(responce, manager.removeResponse(id));
+		Assert.assertNull(manager.getResponse(id));
+		Assert.assertNull(manager.removeResponse(id));
+
 	}
 
 	@Test
@@ -60,6 +64,11 @@ public class TestThreadPoolDownloadManager {
 		Assert.assertEquals(DownloadStatus.DONE, manager.getStatus(id));
 		Assert.assertEquals(responce, manager.getResponse(id));
 		Assert.assertEquals(responce, manager.waitResponse(id));
+
+		id = manager.addDownloadRequest(new DownloadRequest());
+		Assert.assertNull(manager.removeResponse(id));
+
+		manager.shutdown();
 	}
 
 	@Test
@@ -71,7 +80,7 @@ public class TestThreadPoolDownloadManager {
 		Thread.sleep(110);
 		Assert.assertEquals(DownloadStatus.DONE, manager.getStatus(id1));
 		Assert.assertEquals(DownloadStatus.DONE, manager.getStatus(id2));
-
+		manager.shutdown();
 	}
 
 	private ThreadPoolDownloadManager getDelayedManager(final int threads, final long timeout, final DownloadResponse responce) {

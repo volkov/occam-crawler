@@ -97,6 +97,10 @@ public class ThreadPoolDownloadManager implements DownloadManager {
 	@Override
 	public boolean cancelRequest(Long id) {
 		FetchInfo info = data.get(id);
+		return cancelRequest(info);
+	}
+
+	private boolean cancelRequest(FetchInfo info) {
 		if (info == null) {
 			return false;
 		}
@@ -123,6 +127,13 @@ public class ThreadPoolDownloadManager implements DownloadManager {
 	@Override
 	public DownloadResponse waitResponse(Long id) {
 		FetchInfo info = data.get(id);
+		return waitResponce(info);
+	}
+
+	private DownloadResponse waitResponce(FetchInfo info) {
+		if (info == null) {
+			return null;
+		}
 		try {
 			return info.getFuture().get();
 		} catch (InterruptedException e) {
@@ -131,8 +142,15 @@ public class ThreadPoolDownloadManager implements DownloadManager {
 		} catch (CancellationException e) {
 		}
 		return null;
-
 	}
+
+	@Override
+	public DownloadResponse removeResponse(Long id) {
+		FetchInfo info = data.remove(id);
+		cancelRequest(info);
+		return waitResponce(info);
+	}
+
 
 	@Override
 	public void shutdown() {
